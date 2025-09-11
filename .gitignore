@@ -1,4 +1,5 @@
-*.meta
+*.asset
+*.txt
 *.asset
 *.txt
 Packages/*
@@ -21,6 +22,11 @@ tools/check_links.sh
 *ClientSimStorage*
 *ClientSimStorage*
 !Assets/Molecule
+!Assets/Molecule/**
+!Assets/Molecule/**/*.meta
+!Assets/Scenes
+!Assets/Scenes/**
+!Assets/Scenes/**/*.meta
 Assets/*
 *Assets/TextMesh Pro*
 *tools*
