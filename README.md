@@ -13,6 +13,8 @@
 - UdonSharp VPM リポジトリ（例）: https://vpm.koyashiro.net/index.json
 - Unity Compute Shader 解説: https://docs.unity3d.com/Manual/ComputeShaders.html
 - XYZ ファイル形式: https://en.wikipedia.org/wiki/XYZ_file_format
+- CCDC 構造検索: https://www.ccdc.cam.ac.uk/structures/
+  - 例: Mol 取得エンドポイント: https://www.ccdc.cam.ac.uk/structures/Data/Mol?id=1133493&databaseId=0
 
 ## 主な機能
 - **XYZ 読み込み**: ローカルのテストデータまたは URL から XYZ 形式の分子データを読み込み。
@@ -36,6 +38,7 @@
   - `keys` と `urls` の配列で分子名と取得先 URL を対応付けます。
   - エディタでは `file://` プレフィックスのローカルパスに対応（例: `file:///.../Assets/Molecule/TestData/water.xyz`）。
   - VRChat 実行時は `VRCStringDownloader.LoadUrl` によりネットワークから取得します。
+  - CCDC の Mol(V2000) もサポート（自動で XYZ に変換）。`ccdcUrlTemplate` に ID をはめ込み `LoadCcdcById("1133493")` などで取得可能。`ccdc-check` 付与が必要な場合は `LoadByUrl()` で完全URLを指定してください。
 - UI スクリプト: `Assets/Molecule/Scripts/MoleculeUI.cs`
   - ドロップダウン選択と「Load」ボタンから `MoleculeDownloader` を呼び出します。
 
@@ -58,3 +61,4 @@
 ## 既知の制限
 - 対応元素は現状 `H, C, N, O, F, P, S, Cl` のみ（未定義は既定で C を使用）。
 - 結合は距離しきい値による簡易推定であり、化学的厳密性は保証しません。
+- CCDC 等の外部サイトは利用規約・CORS 制約があります。VRChat のリモート文字列ロードでは HTTPS と許可されたヘッダが必要です。

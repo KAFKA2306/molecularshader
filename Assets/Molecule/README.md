@@ -12,6 +12,8 @@ WebソースからXYZ分子データをダウンロードし、コンピュー�
 - UdonSharp VPM Repository (例): https://vpm.koyashiro.net/index.json
 - Unity Compute Shaders Manual: https://docs.unity3d.com/Manual/ComputeShaders.html
 - XYZ File Format: https://en.wikipedia.org/wiki/XYZ_file_format
+- CCDC Structures: https://www.ccdc.cam.ac.uk/structures/
+  - Example Mol endpoint: https://www.ccdc.cam.ac.uk/structures/Data/Mol?id=1133493&databaseId=0
 
 ## 機能
 
@@ -53,11 +55,28 @@ WebソースからXYZ分子データをダウンロードし、コンピュー�
 ```csharp
 public string[] keys = {"ethanol", "water", "benzene"};
 public string[] urls = {
-    "https://your-cdn.com/molecules/ethanol.xyz",
-    "https://your-cdn.com/molecules/water.xyz", 
-    "https://your-cdn.com/molecules/benzene.xyz"
+    // 公開ホスティングされたXYZを直接参照
+    "https://example.cdn/molecules/ethanol.xyz",
+    "https://example.cdn/molecules/water.xyz", 
+    "https://example.cdn/molecules/benzene.xyz"
 };
 ```
+
+CCDCのMol（V2000）をID指定で取得して自動的にXYZへ変換することも可能です。
+```csharp
+// テンプレートはInspectorで編集可（既定値）
+downloader.ccdcUrlTemplate = "https://www.ccdc.cam.ac.uk/structures/Data/Mol?id={id}&databaseId=0";
+
+// 呼び出し例（UIや他スクリプトから）
+downloader.LoadCcdcById("1133493"); // テンプレートからURL生成
+// もしくは完全なURLを直接指定（ccdc-checkが必要な場合など）
+downloader.LoadByUrl("https://www.ccdc.cam.ac.uk/structures/Data/Mol?id=1133493&databaseId=0&ccdc-check=...");
+```
+
+注意:
+- ダウンローダーはXYZ/MOL(V2000)を自動判定し、XYZに正規化して描画に渡します。
+- CCDCはアクセス制御や一時トークン（`ccdc-check`）を用いる場合があります。URLが期限切れになる可能性があります。
+- VRChat実行時のリモート文字列ロードはHTTPSと適切なヘッダ（CORS）が必要です。Unityエディタで取得できても、VRChat内ではCORSで失敗する場合があります。
 
 ## 使用方法
 

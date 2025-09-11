@@ -144,6 +144,17 @@ public class MoleculeRaymarchDriver : MonoBehaviour
         isDirty = true;
     }
 
+    // --- Test helpers ---
+    public int GetAtomCount()
+    {
+        return atoms != null ? atoms.Count : 0;
+    }
+
+    public int GetBondCount()
+    {
+        return bonds != null ? bonds.Count : 0;
+    }
+
     void SetupElementBuffers()
     {
         elementColorsBuffer?.Release();
