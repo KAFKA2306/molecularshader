@@ -96,6 +96,8 @@ public class MoleculeRaymarchDriver : MonoBehaviour
 
     private string xyzText;
     private bool isDirty = false;
+    private bool warnedNoCompute = false;
+    private bool warnedNoCamera = false;
     
     void Start()
     {
@@ -118,6 +120,16 @@ public class MoleculeRaymarchDriver : MonoBehaviour
         if (renderTarget == null || renderTarget.width != resolution.x || renderTarget.height != resolution.y)
         {
             SetupRenderTarget();
+        }
+
+        if (!SystemInfo.supportsComputeShaders)
+        {
+            if (!warnedNoCompute)
+            {
+                Debug.LogWarning("Compute shaders not supported on this platform. Molecule rendering disabled.");
+                warnedNoCompute = true;
+            }
+            return;
         }
 
         if (computeShader != null && renderTarget != null)
@@ -194,7 +206,12 @@ public class MoleculeRaymarchDriver : MonoBehaviour
             if (parts.Length >= 4)
             {
                 string element = parts[0];
-                
+                // Normalize element case (e.g., h -> H, cl -> Cl)
+                if (element.Length > 1)
+                    element = char.ToUpperInvariant(element[0]) + element.Substring(1).ToLowerInvariant();
+                else
+                    element = element.ToUpperInvariant();
+
                 if (float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float x) &&
                     float.TryParse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture, out float y) &&
                     float.TryParse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture, out float z))
@@ -248,6 +265,15 @@ public class MoleculeRaymarchDriver : MonoBehaviour
     void RenderMolecule()
     {
         if (atomBuffer == null || atoms.Count == 0) return;
+        if (cameraTransform == null)
+        {
+            if (!warnedNoCamera)
+            {
+                Debug.LogWarning("No camera assigned to MoleculeRaymarchDriver; skipping render.");
+                warnedNoCamera = true;
+            }
+            return;
+        }
 
         int kernelIndex = computeShader.FindKernel("CSMain");
         

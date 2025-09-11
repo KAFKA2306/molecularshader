@@ -12,3 +12,6 @@ Packages/*
 *.csproj
 *.sln
 *.vscode*
+*.png
+*.mat
+*.unity
