@@ -7,6 +7,7 @@ using UnityEngine;
 // Usage:
 // - Assign an instance to MoleculeRaymarchDriver.spatial.
 // - If null, the driver falls back to its legacy fields.
+[CreateAssetMenu(menuName = "Molecule/Spatial Config", fileName = "MoleculeSpatialConfig")]
 public class MoleculeSpatialConfig : ScriptableObject
 {
     [Header("Normalization")]
@@ -34,4 +35,3 @@ public class MoleculeSpatialConfig : ScriptableObject
     [Tooltip("Default bond cylinder radius in Angstrom when generating bonds.")]
     public float bondRadiusAngstrom = 0.15f;
 }
-
