@@ -1,3 +1,4 @@
+#if UNITY_INCLUDE_TESTS
 using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
@@ -26,4 +27,4 @@ public class EthanolMockPlayModeTests
         Object.Destroy(go);
     }
 }
-
+#endif
