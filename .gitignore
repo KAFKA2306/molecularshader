@@ -18,7 +18,8 @@ Packages/*
 *UserSettings*
 tools/check_links.sh
 !README.md
-
+*ClientSimStorage*
+*ClientSimStorage*
 !Assets/Molecule
 Assets/*
 *Assets/TextMesh Pro*
