@@ -44,8 +44,14 @@ public class MoleculeRaymarchDriver : MonoBehaviour
     public float nearPlane = 0.1f;
     public float farPlane = 100f;
     
-    [Header("Rendering Settings")]
+    [Header("Spatial Config")]
+    [Tooltip("Controls centering and scaling from Angstrom to Unity.")]
+    public MoleculeSpatialConfig spatial;
+
+    [Header("Rendering Settings (Legacy Fallback)")]
+    [Tooltip("Legacy: Additional atom radius multiplier if no SpatialConfig is assigned.")]
     public float atomScale = 1.0f;
+    [Tooltip("Legacy: Additional bond radius multiplier if no SpatialConfig is assigned.")]
     public float bondScale = 0.2f;
     
     [Header("Lighting")]
@@ -53,7 +59,8 @@ public class MoleculeRaymarchDriver : MonoBehaviour
     public Color lightColor = Color.white;
     public float ambientIntensity = 0.3f;
     
-    [Header("Bond Detection")]
+    [Header("Bond Detection (Angstrom)")]
+    [Tooltip("Threshold in Angstrom for deciding if two atoms are bonded (distance < threshold).")]
     public float bondDistanceThreshold = 1.8f;
     
     // Element data (atomic number -> color/radius)
@@ -98,6 +105,13 @@ public class MoleculeRaymarchDriver : MonoBehaviour
     private bool isDirty = false;
     private bool warnedNoCompute = false;
     private bool warnedNoCamera = false;
+
+    // Spatial diagnostics
+    private Vector3 lastRawBoundsCenter;
+    private Vector3 lastRawBoundsSize;
+    private Vector3 lastBoundsCenter;
+    private Vector3 lastBoundsSize;
+    private float appliedScale = 1f;
     
     void Start()
     {
@@ -170,6 +184,11 @@ public class MoleculeRaymarchDriver : MonoBehaviour
         return bonds != null ? bonds.Count : 0;
     }
 
+    // --- Spatial helpers for tests/diagnostics ---
+    public Vector3 GetBoundsCenter() { return lastBoundsCenter; }
+    public Vector3 GetBoundsSize() { return lastBoundsSize; }
+    public float GetAppliedScale() { return appliedScale; }
+
     void SetupElementBuffers()
     {
         elementColorsBuffer?.Release();
@@ -222,8 +241,10 @@ public class MoleculeRaymarchDriver : MonoBehaviour
         }
 
         // Skip comment line (line 1)
-        // Parse atoms starting from line 2
-        for (int i = 2; i < lines.Length && atoms.Count < atomCount; i++)
+        // Parse atoms starting from line 2 (positions in Angstrom)
+        var rawPositions = new List<Vector3>(atomCount);
+        var rawElements = new List<uint>(atomCount);
+        for (int i = 2; i < lines.Length && rawPositions.Count < atomCount; i++)
         {
             string line = lines[i].Trim();
             if (string.IsNullOrEmpty(line)) continue;
@@ -243,20 +264,77 @@ public class MoleculeRaymarchDriver : MonoBehaviour
                     float.TryParse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture, out float z))
                 {
                     uint elementIndex = ElementMap.ContainsKey(element) ? ElementMap[element] : 1; // Default to Carbon
-                    atoms.Add(new AtomData(new Vector3(x, y, z), elementIndex));
+                    rawPositions.Add(new Vector3(x, y, z));
+                    rawElements.Add(elementIndex);
                 }
             }
         }
 
-        // Generate bonds based on distance
+        // Compute raw bounds (Angstrom)
+        if (rawPositions.Count == 0)
+            return;
+        var min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+        var max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+        for (int i = 0; i < rawPositions.Count; i++)
+        {
+            var p = rawPositions[i];
+            if (p.x < min.x) min.x = p.x; if (p.y < min.y) min.y = p.y; if (p.z < min.z) min.z = p.z;
+            if (p.x > max.x) max.x = p.x; if (p.y > max.y) max.y = p.y; if (p.z > max.z) max.z = p.z;
+        }
+        var rawCenter = (min + max) * 0.5f;
+        var rawSize = new Vector3(Mathf.Max(1e-6f, max.x - min.x), Mathf.Max(1e-6f, max.y - min.y), Mathf.Max(1e-6f, max.z - min.z));
+        lastRawBoundsCenter = rawCenter; lastRawBoundsSize = rawSize;
+
+        // Decide scale factor (Unity units per Angstrom)
+        float scaleFactor;
+        bool useAutoFit = spatial != null ? spatial.autoFit : false;
+        if (useAutoFit)
+        {
+            float longest = Mathf.Max(rawSize.x, Mathf.Max(rawSize.y, rawSize.z));
+            float target = Mathf.Max(1e-6f, spatial.targetBoundsSize);
+            scaleFactor = target / Mathf.Max(1e-6f, longest);
+        }
+        else
+        {
+            float a2u = spatial != null ? spatial.angstromToUnity : 0.01f;
+            scaleFactor = a2u;
+        }
+        appliedScale = scaleFactor;
+
+        // Centering offset in Angstrom before scaling
+        bool center = spatial != null ? spatial.centerAtOrigin : true;
+        var centerOffset = center ? rawCenter : Vector3.zero;
+
+        // Transform positions → Unity units and fill atoms list
+        atoms.Clear();
+        for (int i = 0; i < rawPositions.Count; i++)
+        {
+            var sp = (rawPositions[i] - centerOffset) * scaleFactor;
+            atoms.Add(new AtomData(sp, rawElements[i]));
+        }
+
+        // Update post-transform bounds for diagnostics
+        var tmin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+        var tmax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
         for (int i = 0; i < atoms.Count; i++)
         {
-            for (int j = i + 1; j < atoms.Count; j++)
+            var p = atoms[i].position;
+            if (p.x < tmin.x) tmin.x = p.x; if (p.y < tmin.y) tmin.y = p.y; if (p.z < tmin.z) tmin.z = p.z;
+            if (p.x > tmax.x) tmax.x = p.x; if (p.y > tmax.y) tmax.y = p.y; if (p.z > tmax.z) tmax.z = p.z;
+        }
+        lastBoundsCenter = (tmin + tmax) * 0.5f;
+        lastBoundsSize = new Vector3(tmax.x - tmin.x, tmax.y - tmin.y, tmax.z - tmin.z);
+
+        // Generate bonds based on raw distances (Angstrom)
+        float bondRadiusA = spatial != null ? spatial.bondRadiusAngstrom : 0.1f;
+        for (int i = 0; i < rawPositions.Count; i++)
+        {
+            for (int j = i + 1; j < rawPositions.Count; j++)
             {
-                float distance = Vector3.Distance(atoms[i].position, atoms[j].position);
+                float distance = Vector3.Distance(rawPositions[i], rawPositions[j]);
                 if (distance < bondDistanceThreshold)
                 {
-                    bonds.Add(new BondData((uint)i, (uint)j, 0.1f));
+                    bonds.Add(new BondData((uint)i, (uint)j, bondRadiusA));
                 }
             }
         }
@@ -320,9 +398,11 @@ public class MoleculeRaymarchDriver : MonoBehaviour
         // Set camera matrices
         SetCameraMatrices(kernelIndex);
         
-        // Set rendering parameters
-        computeShader.SetFloat("_AtomScale", atomScale);
-        computeShader.SetFloat("_BondScale", bondScale);
+        // Set rendering parameters (scale radii from Angstrom → Unity, then apply multipliers)
+        float atomScaleMul = spatial != null ? spatial.atomScale : atomScale;
+        float bondScaleMul = spatial != null ? spatial.bondScale : bondScale;
+        computeShader.SetFloat("_AtomScale", appliedScale * atomScaleMul);
+        computeShader.SetFloat("_BondScale", appliedScale * bondScaleMul);
         
         // Set lighting
         var ld = lightDirection.normalized;
