@@ -46,11 +46,17 @@ public class MoleculeUI : MonoBehaviour
         if (useLocalTestData && downloader != null)
         {
             // Override URLs for local testing
+            string basePath = Application.dataPath.Replace("\\", "/");
+            if (!basePath.StartsWith("/"))
+            {
+                // Ensure absolute path URI form: file:///...
+                basePath = "/" + basePath;
+            }
             downloader.urls = new string[]
             {
-                "file://" + Application.dataPath + "/Molecule/TestData/ethanol.xyz",
-                "file://" + Application.dataPath + "/Molecule/TestData/water.xyz", 
-                "file://" + Application.dataPath + "/Molecule/TestData/benzene.xyz"
+                "file://" + basePath + "/Molecule/TestData/ethanol.xyz",
+                "file://" + basePath + "/Molecule/TestData/water.xyz", 
+                "file://" + basePath + "/Molecule/TestData/benzene.xyz"
             };
         }
     }

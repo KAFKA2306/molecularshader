@@ -87,17 +87,12 @@ public class MoleculeDownloader : UdonSharpBehaviour
         return null;
     }
 
-    #if UNITY_EDITOR
     void LoadLocalFile(string fileUrl)
     {
         // fileUrl expected like: file:///absolute/path/to/file.xyz
         try
         {
-            string path = fileUrl;
-            if (path.StartsWith("file://"))
-            {
-                path = path.Substring("file://".Length);
-            }
+            string path = new System.Uri(fileUrl).LocalPath;
 
             if (!System.IO.File.Exists(path))
             {
@@ -120,7 +115,6 @@ public class MoleculeDownloader : UdonSharpBehaviour
             Debug.LogError($"Failed to load local file '{fileUrl}': {ex.Message}");
         }
     }
-    #endif
 
     [ContextMenu("Load Selected Molecule")]
     public void LoadSelected()

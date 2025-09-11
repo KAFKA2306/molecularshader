@@ -259,7 +259,8 @@ public class MoleculeUISetup : EditorWindow
         
         Image templateImage = templateGO.AddComponent<Image>();
         templateImage.color = Color.white;
-        
+        var scrollRect = templateGO.AddComponent<ScrollRect>();
+
         // Create Viewport
         GameObject viewportGO = new GameObject("Viewport");
         viewportGO.transform.SetParent(templateGO.transform, false);
@@ -270,9 +271,10 @@ public class MoleculeUISetup : EditorWindow
         viewportRect.sizeDelta = Vector2.zero;
         viewportRect.anchoredPosition = Vector2.zero;
         
-        viewportGO.AddComponent<Image>();
+        var viewportImage = viewportGO.AddComponent<Image>();
         viewportGO.AddComponent<Mask>().showMaskGraphic = false;
-        
+        scrollRect.viewport = viewportRect;
+
         // Create Content
         GameObject contentGO = new GameObject("Content");
         contentGO.transform.SetParent(viewportGO.transform, false);
@@ -282,6 +284,7 @@ public class MoleculeUISetup : EditorWindow
         contentRect.anchorMax = Vector2.one;
         contentRect.sizeDelta = Vector2.zero;
         contentRect.anchoredPosition = Vector2.zero;
+        scrollRect.content = contentRect;
         
         // Create Item
         GameObject itemGO = new GameObject("Item");
@@ -294,7 +297,8 @@ public class MoleculeUISetup : EditorWindow
         itemRect.anchoredPosition = Vector2.zero;
         
         Toggle itemToggle = itemGO.AddComponent<Toggle>();
-        itemGO.AddComponent<Image>();
+        var itemBg = itemGO.AddComponent<Image>();
+        itemToggle.targetGraphic = itemBg;
         
         // Create Item Label
         GameObject labelGO = new GameObject("Item Label");
@@ -313,9 +317,22 @@ public class MoleculeUISetup : EditorWindow
         
         // Configure dropdown
         dropdown.template = templateRect;
-        dropdown.captionText = label;
         dropdown.itemText = label;
-        
+
+        // Add caption text under dropdown root (separate from template)
+        GameObject captionGO = new GameObject("Label");
+        captionGO.transform.SetParent(dropdown.transform, false);
+        var captionRect = captionGO.AddComponent<RectTransform>();
+        captionRect.anchorMin = new Vector2(0, 0);
+        captionRect.anchorMax = new Vector2(1, 1);
+        captionRect.offsetMin = new Vector2(10, 1);
+        captionRect.offsetMax = new Vector2(-10, -2);
+        var captionText = captionGO.AddComponent<TextMeshProUGUI>();
+        captionText.text = "Select Molecule";
+        captionText.fontSize = 14;
+        captionText.color = Color.black;
+        dropdown.captionText = captionText;
+
         templateGO.SetActive(false);
     }
 }
