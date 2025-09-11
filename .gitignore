@@ -3,5 +3,9 @@
 *.txt
 Packages/*
 *Packages*
+*Library*
+*Logs*
+*Temp*
+
 *.dll
 *.md

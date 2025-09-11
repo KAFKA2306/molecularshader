@@ -114,6 +114,12 @@ public class MoleculeRaymarchDriver : MonoBehaviour
             isDirty = false;
         }
 
+        // Ensure render target matches requested resolution
+        if (renderTarget == null || renderTarget.width != resolution.x || renderTarget.height != resolution.y)
+        {
+            SetupRenderTarget();
+        }
+
         if (computeShader != null && renderTarget != null)
         {
             RenderMolecule();
@@ -304,11 +310,16 @@ public class MoleculeRaymarchDriver : MonoBehaviour
         bondBuffer?.Release();
         elementColorsBuffer?.Release();
         elementRadiiBuffer?.Release();
-        
+
         if (renderTarget != null)
         {
             renderTarget.Release();
             renderTarget = null;
         }
+    }
+
+    void OnDestroy()
+    {
+        OnDisable();
     }
 }

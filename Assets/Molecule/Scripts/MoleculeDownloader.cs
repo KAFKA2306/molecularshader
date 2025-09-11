@@ -40,7 +40,15 @@ public class MoleculeDownloader : UdonSharpBehaviour
         }
 
         Debug.Log($"Loading molecule: {key} from {url}");
-        VRCStringDownloader.LoadUrl(url, (IUdonEventReceiver)this);
+        // Support local file loading in Editor or offline by bypassing VRCStringDownloader
+        if (url.StartsWith("file://"))
+        {
+            LoadLocalFile(url);
+        }
+        else
+        {
+            VRCStringDownloader.LoadUrl(url, (IUdonEventReceiver)this);
+        }
     }
 
     public override void OnStringLoadSuccess(IVRCStringDownload result)
@@ -73,6 +81,39 @@ public class MoleculeDownloader : UdonSharpBehaviour
             }
         }
         return null;
+    }
+
+    void LoadLocalFile(string fileUrl)
+    {
+        // fileUrl expected like: file:///absolute/path/to/file.xyz
+        try
+        {
+            string path = fileUrl;
+            if (path.StartsWith("file://"))
+            {
+                path = path.Substring("file://".Length);
+            }
+
+            if (!System.IO.File.Exists(path))
+            {
+                Debug.LogError($"Local file not found: {path}");
+                return;
+            }
+
+            string xyz = System.IO.File.ReadAllText(path);
+            if (driver != null)
+            {
+                driver.SetXYZText(xyz);
+            }
+            else
+            {
+                Debug.LogError("MoleculeRaymarchDriver is null!");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Failed to load local file '{fileUrl}': {ex.Message}");
+        }
     }
 
     [ContextMenu("Load Selected Molecule")]
