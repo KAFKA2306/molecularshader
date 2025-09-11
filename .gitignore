@@ -15,7 +15,11 @@ Packages/*
 *.png
 *.mat
 *.log
+*UserSettings*
 tools/check_links.sh
 !README.md
 
+!Assets/Molecule
+Assets/*
 *Assets/TextMesh Pro*
+*tools*

@@ -1,10 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
+#if TMP_PRESENT
 using TMPro;
+#endif
 
 public class MoleculeUISetup : EditorWindow
 {
+#if TMP_PRESENT
     [MenuItem("Tools/Molecule/Setup UI Canvas")]
     public static void SetupCanvas()
     {
@@ -359,4 +362,35 @@ public class MoleculeUISetup : EditorWindow
 
         templateGO.SetActive(false);
     }
+    
+#else // TMP_PRESENT not defined
+
+    // Fallback stubs when TextMeshPro is missing: keep menus discoverable and informative.
+    [MenuItem("Tools/Molecule/Setup UI Canvas")]
+    public static void SetupCanvasStub()
+    {
+        EditorUtility.DisplayDialog(
+            "TextMeshPro Required",
+            "This action requires the TextMeshPro package (com.unity.textmeshpro).\nPlease install it via Package Manager and try again.",
+            "OK");
+    }
+
+    [MenuItem("Tools/Molecule/Setup Test Scene")]
+    public static void SetupTestSceneStub()
+    {
+        SetupCanvasStub();
+    }
+
+    [MenuItem("Tools/Molecule/Setup VRChat Scene")]
+    public static void SetupVRChatSceneStub()
+    {
+        SetupCanvasStub();
+    }
+
+    [MenuItem("Tools/Molecule/Setup Complete Scene")]
+    public static void SetupCompleteSceneStub()
+    {
+        SetupCanvasStub();
+    }
+#endif // TMP_PRESENT
 }
