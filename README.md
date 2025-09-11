@@ -77,3 +77,49 @@
   - `Resources/TestMolecules/ethanol.xyz` の存在確認
   - シーン内 `MoleculeRaymarchDriver` の `computeShader`/`cameraTransform` の未設定を検知し、可能なら自動割当
 - 必要に応じて `Tools > Molecule > Auto-Assign Compute Shader to Drivers` を実行してください。
+
+## 使い方（Unity 上）
+1. Unity `2022.3.22f1` で本プロジェクトを開く。
+2. シーン `Assets/Scenes/VRCDefaultWorldScene.unity` を開く。
+3. メニュー `Tools > Molecule > Validate Project Health` を実行し、警告が出た場合は指示に従って解消。
+   - `computeShader` 未割当の警告が出たら `Tools > Molecule > Auto-Assign Compute Shader to Drivers` を実行。
+   - カメラ未割当の場合は、シーンの `Main Camera` を確認するか、`MoleculeRaymarchDriver.cameraTransform` に手動でアサイン。
+4. シーン内の `MoleculeSceneSetup`（存在する場合）は `setupOnStart` が有効のため、自動で UI/ドライバが接続されます。
+   - 任意で `MoleculeSceneSetup > Setup Molecule System`（インスペクタの ContextMenu）を実行して再接続可能。
+5. `MoleculeUI` の `useLocalTestData` がオン（既定）であることを確認。
+   - これにより `Assets/Molecule/TestData/` の `ethanol.xyz / water.xyz / benzene.xyz` がドロップダウンで選択可能になります。
+6. 再生（Play）し、画面の UI で分子を選択 → `Load` ボタンをクリック。
+   - `RawImage` にレイマーチ結果が表示されます。表示されない場合は「トラブルシュート」を参照。
+7. 表示調整は `MoleculeRaymarchDriver` の各パラメータで行います。
+   - 解像度: `resolution`
+   - スケール: `atomScale`, `bondScale`
+   - 視野・クリップ: `fieldOfView`, `nearPlane`, `farPlane`
+   - ライティング: `lightDirection`, `lightColor`, `ambientIntensity`
+
+## 使い方（VRChat 上）
+1. VCC で必要パッケージを導入済みであることを確認（`VRChat Worlds / Udon / UdonSharp`）。
+2. Unity 上で `MoleculeUI.useLocalTestData` をオフに変更。
+   - VRChat 実行環境では `file://` のローカルパスが使用できないため、リモート URL を使います。
+3. `MoleculeDownloader` の `keys / urls` に公開済みの HTTPS エンドポイントを設定。
+   - 例: `keys = ["ethanol", "water", "benzene"]` に対して、`urls` を各 `.xyz`（または CCDC Mol）への HTTPS 直リンクに更新。
+   - CCDC Mol を使う場合は `ccdcUrlTemplate` に `{id}` を含むテンプレートを設定し、必要に応じて UI/トリガーから `LoadCcdcById` を呼び出してください。
+4. VRChat SDK コントロールパネルを開く（`VRChat SDK > Show Control Panel`）。
+   - ログインがまだの場合はサインイン。
+   - `Builder` タブでエラーがないことを確認（ワールドディスクリプタ等）。
+5. `Build & Test` でローカル確認、問題なければ `Build & Publish for Windows` を実行。
+   - タイトル・説明・サムネイルを設定してアップロード完了まで待機。
+6. VRChat クライアントでアップロードしたワールドをプライベートインスタンスで開く。
+7. ワールド内 UI で分子を選択 → `Load` を押して描画を確認。
+
+## トラブルシュート
+- 表示が真っ黒/何も出ない:
+  - `MoleculeRaymarchDriver.computeShader` が割り当て済みか、`Resources/Shaders/MoleculeRaymarch` が存在するか確認。
+  - `cameraTransform` が割当済みか（`Main Camera` が存在するか）確認。
+  - `renderTarget` の解像度が極端に小さくないか確認（例: `512x512` 以上）。
+- `Load` 後も変化しない:
+  - コンソールに `Parsed X atoms and Y bonds` のログが出ているか確認。出ていなければ XYZ の読み込みに失敗しています。
+  - Unity: `useLocalTestData` をオンにし、`Assets/Molecule/TestData/*.xyz` の存在を確認。
+  - VRChat: `urls` が有効な HTTPS か、`VRCStringDownloader` でブロックされるヘッダが無いかを確認。
+- ビルドエラー（VRChat SDK Builder）:
+  - VCC で依存関係が解決済みか、SDK にサインイン済みか確認。
+  - シーンに `VRCSceneDescriptor` が存在するか確認（通常は同梱シーンに含まれています）。
