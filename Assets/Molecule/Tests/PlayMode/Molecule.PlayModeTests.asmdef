@@ -1,21 +1,20 @@
 {
   "name": "Molecule.PlayModeTests",
   "references": [
-    "Assembly-CSharp",
-    "UnityEngine.TestRunner",
-    "UnityEditor.TestRunner"
+    "Assembly-CSharp"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": false,
   "precompiledReferences": [],
-  "autoReferenced": true,
-  "defineConstraints": [],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
   "versionDefines": [],
   "noEngineReferences": false,
   "optionalUnityReferences": [
     "TestAssemblies"
   ]
 }
-

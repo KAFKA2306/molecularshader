@@ -104,6 +104,21 @@ public class MoleculeRaymarchDriver : MonoBehaviour
         if (cameraTransform == null)
             cameraTransform = Camera.main?.transform;
             
+        // Auto-assign compute shader from Resources if unassigned
+        if (computeShader == null)
+        {
+            var cs = Resources.Load<ComputeShader>("Shaders/MoleculeRaymarch");
+            if (cs != null)
+            {
+                computeShader = cs;
+            }
+            else if (!warnedNoCompute)
+            {
+                Debug.LogWarning("MoleculeRaymarchDriver: computeShader not assigned and not found in Resources/Shaders/MoleculeRaymarch. Assign it in the Inspector.");
+                warnedNoCompute = true;
+            }
+        }
+
         SetupElementBuffers();
         SetupRenderTarget();
     }

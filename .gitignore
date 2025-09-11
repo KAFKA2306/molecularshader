@@ -15,7 +15,7 @@ Packages/*
 *.png
 *.mat
 *.log
-
+tools/check_links.sh
 !README.md
 
 *Assets/TextMesh Pro*
