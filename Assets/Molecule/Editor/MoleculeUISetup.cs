@@ -62,6 +62,18 @@ public class MoleculeUISetup : EditorWindow
             Debug.LogWarning("Main Camera not found; assign cameraTransform on MoleculeRaymarchDriver manually.");
         }
 
+        // Try auto-assign compute shader by name
+        var guids = AssetDatabase.FindAssets("t:ComputeShader MoleculeRaymarch");
+        if (guids != null && guids.Length > 0)
+        {
+            var path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            var cs = AssetDatabase.LoadAssetAtPath<ComputeShader>(path);
+            if (cs != null)
+            {
+                driver.computeShader = cs;
+            }
+        }
+
         // Select the created system
         Selection.activeGameObject = moleculeSystemGO;
 
@@ -118,6 +130,18 @@ public class MoleculeUISetup : EditorWindow
         else
         {
             Debug.LogWarning("Main Camera not found; assign cameraTransform on MoleculeRaymarchDriver manually.");
+        }
+        
+        // Try auto-assign compute shader by name
+        var guids = AssetDatabase.FindAssets("t:ComputeShader MoleculeRaymarch");
+        if (guids != null && guids.Length > 0)
+        {
+            var path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            var cs = AssetDatabase.LoadAssetAtPath<ComputeShader>(path);
+            if (cs != null)
+            {
+                driver.computeShader = cs;
+            }
         }
         
         // Select the created system

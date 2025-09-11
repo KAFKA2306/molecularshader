@@ -27,6 +27,14 @@
 - **VRChat SDK3 / Udon / UdonSharp**: 本リポジトリに同梱されています（`Assets/UdonSharp`, `VRC.*`）。
 - ネットワークダウンロードは VRChat 実行時に `VRCStringDownloader` を使用します。
 
+## VRChat SDK の導入（VCC 推奨）
+- VRChat Creator Companion (VCC) で本プロジェクトを追加し、以下のパッケージを追加してください。
+  - `VRChat Worlds (com.vrchat.worlds)`
+  - `Udon (com.vrchat.udon)`
+  - `UdonSharp (com.vrchat.udonsharp)`
+  - 任意: `ClientSim` などの補助パッケージ
+- 直接 `Packages/manifest.json` を編集するのではなく、VCC 経由を推奨します。
+
 ## クイックスタート
 1. Unity `2022.3.22f1` でプロジェクトを開く。
 2. シーン `Assets/Scenes/VRCDefaultWorldScene.unity` を開く。
@@ -62,3 +70,10 @@
 - 対応元素は現状 `H, C, N, O, F, P, S, Cl` のみ（未定義は既定で C を使用）。
 - 結合は距離しきい値による簡易推定であり、化学的厳密性は保証しません。
 - VRChat のリモート文字列ロードでは HTTPS と許可されたヘッダが必要です。
+
+## ヘルスチェックと自動修復
+- メニュー `Tools > Molecule > Validate Project Health` で以下を検査・一部自動修正します。
+  - VRChat SDK/UdonSharp の導入確認（未導入なら CRITICAL を表示）
+  - `Resources/TestMolecules/ethanol.xyz` の存在確認
+  - シーン内 `MoleculeRaymarchDriver` の `computeShader`/`cameraTransform` の未設定を検知し、可能なら自動割当
+- 必要に応じて `Tools > Molecule > Auto-Assign Compute Shader to Drivers` を実行してください。

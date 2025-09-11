@@ -178,3 +178,8 @@ H  -0.757   0.586   0.000
 - VRChat SDK - Worlds
 - UdonSharp
 - VRChat String Loading API
+
+## セットアップ補助 / ヘルスチェック
+
+- `Tools > Molecule > Setup Test Scene`/`Setup VRChat Scene`: UIとコンポーネントを自動配置。Compute Shaderは自動検出して割当を試みます。
+- `Tools > Molecule > Validate Project Health`: 依存関係（VRChat SDK/UdonSharp）、Resources配置、ComputeShader/カメラの割当状況を検査し、可能な範囲で自動修復します。
