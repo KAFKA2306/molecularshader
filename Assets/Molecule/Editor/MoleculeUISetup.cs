@@ -20,32 +20,51 @@ public class MoleculeUISetup : EditorWindow
         // Create Molecule System GameObject
         GameObject moleculeSystemGO = new GameObject("MoleculeTestSystem");
         
-        // Add test components (no UdonSharp dependencies)
+        // Add components (no UdonSharp dependencies)
         MoleculeRaymarchDriver driver = moleculeSystemGO.AddComponent<MoleculeRaymarchDriver>();
-        MoleculeTestDriver testDriver = moleculeSystemGO.AddComponent<MoleculeTestDriver>();
-        
+        if (driver == null)
+        {
+            Debug.LogError("Failed to add MoleculeRaymarchDriver to MoleculeTestSystem");
+            return;
+        }
+
+        MoleculeUI ui = moleculeSystemGO.AddComponent<MoleculeUI>();
+        if (ui == null)
+        {
+            Debug.LogError("Failed to add MoleculeUI to MoleculeTestSystem (script compile issue?)");
+            return;
+        }
+
         // Connect components
-        testDriver.driver = driver;
-        
+        ui.driver = driver;
+
         // Connect UI elements
-        Transform panelTransform = canvasGO.transform.Find("Panel");
+        Transform panelTransform = canvasGO != null ? canvasGO.transform.Find("Panel") : null;
         if (panelTransform != null)
         {
-            testDriver.moleculeDropdown = panelTransform.Find("MoleculeDropdown")?.GetComponent<TMP_Dropdown>();
-            testDriver.displayImage = panelTransform.Find("MoleculeDisplay")?.GetComponent<RawImage>();
-            testDriver.loadButton = panelTransform.Find("LoadButton")?.GetComponent<Button>();
+            ui.moleculeDropdown = panelTransform.Find("MoleculeDropdown")?.GetComponent<TMP_Dropdown>();
+            ui.displayImage = panelTransform.Find("MoleculeDisplay")?.GetComponent<RawImage>();
+            ui.loadButton = panelTransform.Find("LoadButton")?.GetComponent<Button>();
         }
-        
+        else
+        {
+            Debug.LogWarning("Panel not found under created MoleculeCanvas; UI references not wired");
+        }
+
         // Setup camera reference (try to find main camera)
         Camera mainCamera = Camera.main;
         if (mainCamera != null)
         {
             driver.cameraTransform = mainCamera.transform;
         }
-        
+        else
+        {
+            Debug.LogWarning("Main Camera not found; assign cameraTransform on MoleculeRaymarchDriver manually.");
+        }
+
         // Select the created system
         Selection.activeGameObject = moleculeSystemGO;
-        
+
         Debug.Log("Molecule Test Scene setup complete! This version works without UdonSharp for testing.");
         Debug.Log("Configure the compute shader in the MoleculeRaymarchDriver component.");
     }
@@ -61,18 +80,33 @@ public class MoleculeUISetup : EditorWindow
         
         // Add non-UdonSharp components first
         MoleculeRaymarchDriver driver = moleculeSystemGO.AddComponent<MoleculeRaymarchDriver>();
+        if (driver == null)
+        {
+            Debug.LogError("Failed to add MoleculeRaymarchDriver to MoleculeVRChatSystem");
+            return;
+        }
+
         MoleculeUI ui = moleculeSystemGO.AddComponent<MoleculeUI>();
+        if (ui == null)
+        {
+            Debug.LogError("Failed to add MoleculeUI to MoleculeVRChatSystem (script compile issue?)");
+            return;
+        }
         
         // Connect components (downloader will be added manually)
         ui.driver = driver;
         
         // Connect UI elements
-        Transform panelTransform = canvasGO.transform.Find("Panel");
+        Transform panelTransform = canvasGO != null ? canvasGO.transform.Find("Panel") : null;
         if (panelTransform != null)
         {
             ui.moleculeDropdown = panelTransform.Find("MoleculeDropdown")?.GetComponent<TMP_Dropdown>();
             ui.displayImage = panelTransform.Find("MoleculeDisplay")?.GetComponent<RawImage>();
             ui.loadButton = panelTransform.Find("LoadButton")?.GetComponent<Button>();
+        }
+        else
+        {
+            Debug.LogWarning("Panel not found under created MoleculeCanvas; UI references not wired");
         }
         
         // Setup camera reference
@@ -80,6 +114,10 @@ public class MoleculeUISetup : EditorWindow
         if (mainCamera != null)
         {
             driver.cameraTransform = mainCamera.transform;
+        }
+        else
+        {
+            Debug.LogWarning("Main Camera not found; assign cameraTransform on MoleculeRaymarchDriver manually.");
         }
         
         // Select the created system
@@ -91,6 +129,13 @@ public class MoleculeUISetup : EditorWindow
         Debug.Log("2. Connect the downloader to the UI component");
         Debug.Log("3. Assign the compute shader");
         Debug.Log("4. Configure molecule URLs");
+    }
+
+    // Back-compat with earlier menu name reported by users
+    [MenuItem("Tools/Molecule/Setup Complete Scene")]
+    public static void SetupCompleteScene()
+    {
+        SetupVRChatScene();
     }
 
     static GameObject CreateMoleculeCanvas()

@@ -14,7 +14,7 @@ Packages/*
 *.vscode*
 *.png
 *.mat
-*.unity
+
 
 !README.md
 
