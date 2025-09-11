@@ -3,6 +3,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 using VRC.SDK3.StringLoading;
+using VRC.Udon.Common.Interfaces;
 
 public class MoleculeDownloader : UdonSharpBehaviour
 {
@@ -40,15 +41,15 @@ public class MoleculeDownloader : UdonSharpBehaviour
         }
 
         Debug.Log($"Loading molecule: {key} from {url}");
-        // Support local file loading in Editor or offline by bypassing VRCStringDownloader
+        // Support local file loading in the Unity Editor; VRChat runtime will use VRCStringDownloader
+        #if UNITY_EDITOR
         if (url.StartsWith("file://"))
         {
             LoadLocalFile(url);
+            return;
         }
-        else
-        {
-            VRCStringDownloader.LoadUrl(url, (IUdonEventReceiver)this);
-        }
+        #endif
+        VRCStringDownloader.LoadUrl(new VRCUrl(url), (IUdonEventReceiver)this);
     }
 
     public override void OnStringLoadSuccess(IVRCStringDownload result)
@@ -77,12 +78,16 @@ public class MoleculeDownloader : UdonSharpBehaviour
         {
             if (keys[i] == key)
             {
-                return urls[i];
+                if (i < urls.Length)
+                    return urls[i];
+                Debug.LogError($"URL mapping missing for key '{key}' at index {i}");
+                return null;
             }
         }
         return null;
     }
 
+    #if UNITY_EDITOR
     void LoadLocalFile(string fileUrl)
     {
         // fileUrl expected like: file:///absolute/path/to/file.xyz
@@ -115,6 +120,7 @@ public class MoleculeDownloader : UdonSharpBehaviour
             Debug.LogError($"Failed to load local file '{fileUrl}': {ex.Message}");
         }
     }
+    #endif
 
     [ContextMenu("Load Selected Molecule")]
     public void LoadSelected()

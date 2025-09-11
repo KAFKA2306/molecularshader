@@ -273,8 +273,9 @@ public class MoleculeRaymarchDriver : MonoBehaviour
         computeShader.SetFloat("_BondScale", bondScale);
         
         // Set lighting
-        computeShader.SetVector("_LightDirection", lightDirection.normalized);
-        computeShader.SetVector("_LightColor", new Vector3(lightColor.r, lightColor.g, lightColor.b));
+        var ld = lightDirection.normalized;
+        computeShader.SetVector("_LightDirection", new Vector4(ld.x, ld.y, ld.z, 0f));
+        computeShader.SetVector("_LightColor", new Vector4(lightColor.r, lightColor.g, lightColor.b, lightColor.a));
         computeShader.SetFloat("_AmbientIntensity", ambientIntensity);
         
         // Dispatch compute shader
@@ -300,8 +301,10 @@ public class MoleculeRaymarchDriver : MonoBehaviour
         computeShader.SetMatrix("_ProjectionMatrix", projectionMatrix);
         computeShader.SetMatrix("_InverseViewMatrix", viewMatrix.inverse);
         computeShader.SetMatrix("_InverseProjectionMatrix", projectionMatrix.inverse);
-        computeShader.SetVector("_CameraPosition", cameraTransform.position);
-        computeShader.SetVector("_CameraForward", cameraTransform.forward);
+        var camPos = cameraTransform.position;
+        var camFwd = cameraTransform.forward;
+        computeShader.SetVector("_CameraPosition", new Vector4(camPos.x, camPos.y, camPos.z, 1f));
+        computeShader.SetVector("_CameraForward", new Vector4(camFwd.x, camFwd.y, camFwd.z, 0f));
     }
 
     void OnDisable()

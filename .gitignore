@@ -9,3 +9,6 @@ Packages/*
 
 *.dll
 *.md
+*.csproj
+*.sln
+*.vscode*

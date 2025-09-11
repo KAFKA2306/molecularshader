@@ -72,7 +72,7 @@ public class MoleculeUI : MonoBehaviour
         }
     }
     
-    void OnMoleculeSelected(int index)
+    public void OnMoleculeSelected(int index)
     {
         if (downloader != null && index >= 0 && index < downloader.keys.Length)
         {
@@ -82,7 +82,7 @@ public class MoleculeUI : MonoBehaviour
         }
     }
     
-    void OnLoadButtonClicked()
+    public void OnLoadButtonClicked()
     {
         if (downloader != null)
         {
