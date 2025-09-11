@@ -80,11 +80,13 @@ public class MoleculeSceneSetup : MonoBehaviour
     
     void ConnectComponents()
     {
-        // Connect downloader and driver
+        // Connect downloader and driver (only in Editor/Mono, not in UdonSharp)
+#if !COMPILER_UDONSHARP
         if (components.downloader != null && components.driver != null)
         {
             components.downloader.driver = components.driver;
         }
+#endif
         
         // Connect UI system
         if (components.ui != null)

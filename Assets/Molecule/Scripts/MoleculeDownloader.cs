@@ -8,7 +8,13 @@ using VRC.Udon.Common.Interfaces;
 public class MoleculeDownloader : UdonSharpBehaviour
 {
     [TextArea(2,6)] public string selectedKey = "ethanol";
+    // Store the most recent XYZ text so other systems can read it
+    public string latestXYZ;
+
+#if !COMPILER_UDONSHARP
+    // Editor/Mono-only reference; not available in Udon at runtime
     public MoleculeRaymarchDriver driver;
+#endif
     
     [Header("Molecule URL Mapping")]
     public string[] keys = new[] { "ethanol", "water", "benzene" };
@@ -20,6 +26,7 @@ public class MoleculeDownloader : UdonSharpBehaviour
 
     void Start()
     {
+#if !COMPILER_UDONSHARP
         if (driver == null)
         {
             driver = GetComponent<MoleculeRaymarchDriver>();
@@ -28,6 +35,7 @@ public class MoleculeDownloader : UdonSharpBehaviour
                 Debug.LogError("MoleculeRaymarchDriver not found!");
             }
         }
+#endif
     }
 
     public void LoadByKey(string key)
@@ -55,8 +63,10 @@ public class MoleculeDownloader : UdonSharpBehaviour
     public override void OnStringLoadSuccess(IVRCStringDownload result)
     {
         string xyz = result.Result;
+        latestXYZ = xyz;
         Debug.Log($"Successfully loaded XYZ data: {xyz.Length} characters");
-        
+
+#if !COMPILER_UDONSHARP
         if (driver != null)
         {
             driver.SetXYZText(xyz);
@@ -65,6 +75,7 @@ public class MoleculeDownloader : UdonSharpBehaviour
         {
             Debug.LogError("MoleculeRaymarchDriver is null!");
         }
+#endif
     }
 
     public override void OnStringLoadError(IVRCStringDownload result)
@@ -102,6 +113,8 @@ public class MoleculeDownloader : UdonSharpBehaviour
             }
 
             string xyz = System.IO.File.ReadAllText(path);
+            latestXYZ = xyz;
+#if !COMPILER_UDONSHARP
             if (driver != null)
             {
                 driver.SetXYZText(xyz);
@@ -110,6 +123,7 @@ public class MoleculeDownloader : UdonSharpBehaviour
             {
                 Debug.LogError("MoleculeRaymarchDriver is null!");
             }
+#endif
         }
         catch (System.Exception ex)
         {

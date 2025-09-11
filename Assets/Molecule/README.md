@@ -1,55 +1,55 @@
-# VRChat Molecular Visualization System
+# VRChat 分子可視化システム
 
-A Unity/VRChat molecular visualization system that downloads XYZ molecular data from web sources and renders 3D ball-and-stick models using compute shaders.
+WebソースからXYZ分子データをダウンロードし、コンピュートシェーダーを使用して3DボールアンドスティックモデルをレンダリングするUnity/VRChat分子可視化システムです。
 
-## Required Reference URLs
+## 必要な参考URL
 
-- Unity Editor (Archive): https://unity.com/releases/editor/archive (use 2022.3.22f1)
+- Unity Editor (Archive): https://unity.com/releases/editor/archive (2022.3.22f1を使用)
 - VRChat Creator Companion (VCC) Docs: https://vcc.docs.vrchat.com/
 - VRChat Creators Portal: https://creators.vrchat.com/
-- VRChat Udon Docs (incl. String Loading): https://creators.vrchat.com/worlds/udon/
+- VRChat Udon Docs (String Loading含む): https://creators.vrchat.com/worlds/udon/
 - UdonSharp Repository: https://github.com/MerlinVR/UdonSharp
-- UdonSharp VPM Repository (example): https://vpm.koyashiro.net/index.json
+- UdonSharp VPM Repository (例): https://vpm.koyashiro.net/index.json
 - Unity Compute Shaders Manual: https://docs.unity3d.com/Manual/ComputeShaders.html
 - XYZ File Format: https://en.wikipedia.org/wiki/XYZ_file_format
 
-## Features
+## 機能
 
-- **Web-based XYZ data loading** using VRChat's String Loading API
-- **Real-time raymarched rendering** with compute shaders
-- **Ball-and-stick molecular representation** with element-specific colors
-- **Interactive UI** with dropdown molecule selection
-- **Support for common molecules** (ethanol, water, benzene, and extensible)
+- **WebベースのXYZデータロード** VRChatのString Loading APIを使用
+- **リアルタイム レイマーチングレンダリング** コンピュートシェーダー使用
+- **ボールアンドスティック分子表現** 元素固有の色
+- **インタラクティブUI** ドロップダウン分子選択
+- **一般的な分子のサポート** (エタノール、水、ベンゼン、拡張可能)
 
-## Setup Instructions
+## セットアップ手順
 
-### 1. VRChat SDK Setup
-1. Install VRChat SDK - Worlds in Unity
-2. Install UdonSharp package
-3. Add koyashiro's VPM repository: `https://vpm.koyashiro.net/index.json`
+### 1. VRChat SDKセットアップ
+1. UnityでVRChat SDK - Worldsをインストール
+2. UdonSharpパッケージをインストール
+3. koyashiroのVPMリポジトリを追加: `https://vpm.koyashiro.net/index.json`
 
-### 2. Scene Setup
-1. Create a new scene or use existing VRChat world
-2. Create an empty GameObject and attach:
-   - `MoleculeDownloader` script
-   - `MoleculeRaymarchDriver` script
-   - `MoleculeUI` script
+### 2. シーンセットアップ
+1. 新しいシーンを作成するか、既存のVRChatワールドを使用
+2. 空のGameObjectを作成し、以下をアタッチ:
+   - `MoleculeDownloader` スクリプト
+   - `MoleculeRaymarchDriver` スクリプト
+   - `MoleculeUI` スクリプト
 
-### 3. UI Setup
-1. Create a Canvas with:
-   - **TMP_Dropdown** for molecule selection
-   - **RawImage** for displaying the rendered molecule
-   - **Button** for loading the selected molecule
-2. Connect the UI components to the `MoleculeUI` script
-3. Connect the `MoleculeUI` to the downloader and driver scripts
+### 3. UIセットアップ
+1. 以下を含むCanvasを作成:
+   - **TMP_Dropdown** 分子選択用
+   - **RawImage** レンダリングされた分子の表示用
+   - **Button** 選択された分子のロード用
+2. UIコンポーネントを`MoleculeUI`スクリプトに接続
+3. `MoleculeUI`をダウンローダーとドライバースクリプトに接続
 
-### 4. Compute Shader Setup
-1. Assign the `MoleculeRaymarch.compute` shader to the `MoleculeRaymarchDriver`
-2. Configure rendering settings (resolution, atom scale, lighting)
-3. Set up camera transform reference
+### 4. コンピュートシェーダーセットアップ
+1. `MoleculeRaymarch.compute`シェーダーを`MoleculeRaymarchDriver`に割り当て
+2. レンダリング設定を構成（解像度、原子スケール、ライティング）
+3. カメラトランスフォーム参照を設定
 
-### 5. URL Configuration
-Configure molecule URLs in `MoleculeDownloader`:
+### 5. URL構成
+`MoleculeDownloader`で分子URLを構成:
 ```csharp
 public string[] keys = {"ethanol", "water", "benzene"};
 public string[] urls = {
@@ -59,38 +59,38 @@ public string[] urls = {
 };
 ```
 
-## Usage
+## 使用方法
 
-### Local Testing
-1. Set `useLocalTestData = true` in `MoleculeUI`
-2. Test data files are included in `TestData/` folder
-3. Use the `LoadLocalTestData()` method for testing
+### ローカルテスト
+1. `MoleculeUI`で`useLocalTestData = true`に設定
+2. テストデータファイルは`TestData/`フォルダに含まれています
+3. テストには`LoadLocalTestData()`メソッドを使用
 
-### VRChat Deployment
-1. Host XYZ files on a CORS-enabled web server
-2. Update URLs in `MoleculeDownloader`
-3. Set `useLocalTestData = false`
-4. Build and upload to VRChat
+### VRChatデプロイメント
+1. CORS対応のWebサーバーでXYZファイルをホスト
+2. `MoleculeDownloader`でURLを更新
+3. `useLocalTestData = false`に設定
+4. VRChatにビルドしてアップロード
 
-## File Structure
+## ファイル構造
 
 ```
 Assets/Molecule/
 ├── Scripts/
-│   ├── MoleculeDownloader.cs      # Web download & XYZ handling
-│   ├── MoleculeRaymarchDriver.cs  # Compute shader controller
-│   └── MoleculeUI.cs              # UI management
+│   ├── MoleculeDownloader.cs      # Web ダウンロード & XYZ処理
+│   ├── MoleculeRaymarchDriver.cs  # コンピュートシェーダーコントローラー
+│   └── MoleculeUI.cs              # UI管理
 ├── Shaders/
-│   └── MoleculeRaymarch.compute   # Raymarching renderer
+│   └── MoleculeRaymarch.compute   # レイマーチングレンダラー
 └── TestData/
-    ├── ethanol.xyz                # Test molecules
+    ├── ethanol.xyz                # テスト分子
     ├── water.xyz
     └── benzene.xyz
 ```
 
-## XYZ Format Support
+## XYZフォーマットサポート
 
-The system supports standard XYZ molecular format:
+システムは標準のXYZ分子フォーマットをサポート:
 ```
 [atom_count]
 [comment_line]
@@ -99,7 +99,7 @@ The system supports standard XYZ molecular format:
 ...
 ```
 
-Example (water):
+例（水）:
 ```
 3
 water
@@ -108,54 +108,54 @@ H   0.757   0.586   0.000
 H  -0.757   0.586   0.000
 ```
 
-## Supported Elements
+## サポートされている元素
 
-- H (Hydrogen) - White
-- C (Carbon) - Dark Gray  
-- N (Nitrogen) - Blue
-- O (Oxygen) - Red
-- F (Fluorine) - Cyan
-- P (Phosphorus) - Orange
-- S (Sulfur) - Yellow
-- Cl (Chlorine) - Green
+- H (水素) - 白
+- C (炭素) - 濃い灰色  
+- N (窒素) - 青
+- O (酸素) - 赤
+- F (フッ素) - シアン
+- P (リン) - オレンジ
+- S (硫黄) - 黄
+- Cl (塩素) - 緑
 
-## Configuration Options
+## 構成オプション
 
 ### MoleculeRaymarchDriver
-- `resolution`: Render target resolution
-- `atomScale`: Scaling factor for atom spheres
-- `bondScale`: Scaling factor for bonds
-- `bondDistanceThreshold`: Maximum distance for bond detection
-- `lightDirection`: Lighting direction vector
+- `resolution`: レンダーターゲット解像度
+- `atomScale`: 原子球のスケーリング係数
+- `bondScale`: 結合のスケーリング係数
+- `bondDistanceThreshold`: 結合検出の最大距離
+- `lightDirection`: ライティング方向ベクトル
 
-### Performance Notes
-- Larger molecules may impact performance
-- Consider reducing resolution for complex molecules
-- Bond detection is based on distance thresholds
-- Compute shader optimized for small to medium molecules
+### パフォーマンス注記
+- より大きな分子はパフォーマンスに影響する可能性があります
+- 複雑な分子の場合は解像度を下げることを検討
+- 結合検出は距離閾値に基づいています
+- コンピュートシェーダーは小〜中規模の分子用に最適化
 
-## Extending the System
+## システムの拡張
 
-### Adding New Molecules
-1. Add molecule name to `keys` array
-2. Add corresponding URL to `urls` array
-3. Host XYZ file on web server
+### 新しい分子の追加
+1. `keys`配列に分子名を追加
+2. `urls`配列に対応するURLを追加
+3. WebサーバーでXYZファイルをホスト
 
-### Adding New Elements
-1. Update `ElementMap` dictionary
-2. Add color and radius to `ElementColors` and `ElementRadii` arrays
-3. Recompile and test
+### 新しい元素の追加
+1. `ElementMap`辞書を更新
+2. `ElementColors`と`ElementRadii`配列に色と半径を追加
+3. 再コンパイルしてテスト
 
-## Troubleshooting
+## トラブルシューティング
 
-- **No molecule visible**: Check camera position and molecule scale
-- **Download fails**: Verify URL accessibility and CORS settings
-- **Parsing errors**: Ensure XYZ file format is correct
-- **Performance issues**: Reduce resolution or atom count
+- **分子が見えない**: カメラ位置と分子スケールを確認
+- **ダウンロード失敗**: URLアクセス可能性とCORS設定を確認
+- **パース エラー**: XYZファイル形式が正しいことを確認
+- **パフォーマンス問題**: 解像度または原子数を減らす
 
-## Dependencies
+## 依存関係
 
-- Unity 2022.3+ (VRChat compatible)
+- Unity 2022.3+ (VRChat対応)
 - VRChat SDK - Worlds
 - UdonSharp
 - VRChat String Loading API
