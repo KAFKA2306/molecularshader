@@ -1,0 +1,7 @@
+*.meta
+*.asset
+*.txt
+Packages/*
+*Packages*
+*.dll
+*.md
