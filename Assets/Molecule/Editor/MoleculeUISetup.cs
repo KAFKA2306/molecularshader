@@ -11,29 +11,30 @@ public class MoleculeUISetup : EditorWindow
         CreateMoleculeCanvas();
     }
 
-    [MenuItem("Tools/Molecule/Setup Complete Scene")]
-    public static void SetupCompleteScene()
+    [MenuItem("Tools/Molecule/Setup Test Scene")]
+    public static void SetupTestScene()
     {
         // Create Canvas first
         GameObject canvasGO = CreateMoleculeCanvas();
         
         // Create Molecule System GameObject
-        GameObject moleculeSystemGO = new GameObject("MoleculeSystem");
+        GameObject moleculeSystemGO = new GameObject("MoleculeTestSystem");
         
-        // Add required components
-        MoleculeDownloader downloader = moleculeSystemGO.AddComponent<MoleculeDownloader>();
+        // Add test components (no UdonSharp dependencies)
         MoleculeRaymarchDriver driver = moleculeSystemGO.AddComponent<MoleculeRaymarchDriver>();
-        MoleculeUI ui = moleculeSystemGO.AddComponent<MoleculeUI>();
+        MoleculeTestDriver testDriver = moleculeSystemGO.AddComponent<MoleculeTestDriver>();
         
         // Connect components
-        downloader.driver = driver;
-        ui.downloader = downloader;
-        ui.driver = driver;
+        testDriver.driver = driver;
         
         // Connect UI elements
-        ui.moleculeDropdown = canvasGO.transform.Find("MoleculeDropdown").GetComponent<TMP_Dropdown>();
-        ui.displayImage = canvasGO.transform.Find("MoleculeDisplay").GetComponent<RawImage>();
-        ui.loadButton = canvasGO.transform.Find("LoadButton").GetComponent<Button>();
+        Transform panelTransform = canvasGO.transform.Find("Panel");
+        if (panelTransform != null)
+        {
+            testDriver.moleculeDropdown = panelTransform.Find("MoleculeDropdown")?.GetComponent<TMP_Dropdown>();
+            testDriver.displayImage = panelTransform.Find("MoleculeDisplay")?.GetComponent<RawImage>();
+            testDriver.loadButton = panelTransform.Find("LoadButton")?.GetComponent<Button>();
+        }
         
         // Setup camera reference (try to find main camera)
         Camera mainCamera = Camera.main;
@@ -45,7 +46,51 @@ public class MoleculeUISetup : EditorWindow
         // Select the created system
         Selection.activeGameObject = moleculeSystemGO;
         
-        Debug.Log("Molecule UI setup complete! Configure the compute shader and camera settings.");
+        Debug.Log("Molecule Test Scene setup complete! This version works without UdonSharp for testing.");
+        Debug.Log("Configure the compute shader in the MoleculeRaymarchDriver component.");
+    }
+
+    [MenuItem("Tools/Molecule/Setup VRChat Scene")]
+    public static void SetupVRChatScene()
+    {
+        // Create Canvas first
+        GameObject canvasGO = CreateMoleculeCanvas();
+        
+        // Create Molecule System GameObject
+        GameObject moleculeSystemGO = new GameObject("MoleculeVRChatSystem");
+        
+        // Add non-UdonSharp components first
+        MoleculeRaymarchDriver driver = moleculeSystemGO.AddComponent<MoleculeRaymarchDriver>();
+        MoleculeUI ui = moleculeSystemGO.AddComponent<MoleculeUI>();
+        
+        // Connect components (downloader will be added manually)
+        ui.driver = driver;
+        
+        // Connect UI elements
+        Transform panelTransform = canvasGO.transform.Find("Panel");
+        if (panelTransform != null)
+        {
+            ui.moleculeDropdown = panelTransform.Find("MoleculeDropdown")?.GetComponent<TMP_Dropdown>();
+            ui.displayImage = panelTransform.Find("MoleculeDisplay")?.GetComponent<RawImage>();
+            ui.loadButton = panelTransform.Find("LoadButton")?.GetComponent<Button>();
+        }
+        
+        // Setup camera reference
+        Camera mainCamera = Camera.main;
+        if (mainCamera != null)
+        {
+            driver.cameraTransform = mainCamera.transform;
+        }
+        
+        // Select the created system
+        Selection.activeGameObject = moleculeSystemGO;
+        
+        Debug.Log("VRChat Scene base setup complete!");
+        Debug.Log("MANUAL STEPS REQUIRED:");
+        Debug.Log("1. Add 'MoleculeDownloader' UdonSharp component to the MoleculeVRChatSystem GameObject");
+        Debug.Log("2. Connect the downloader to the UI component");
+        Debug.Log("3. Assign the compute shader");
+        Debug.Log("4. Configure molecule URLs");
     }
 
     static GameObject CreateMoleculeCanvas()

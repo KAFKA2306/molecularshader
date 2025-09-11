@@ -15,3 +15,7 @@ Packages/*
 *.png
 *.mat
 *.unity
+
+!README.md
+
+*Assets/TextMesh Pro*
