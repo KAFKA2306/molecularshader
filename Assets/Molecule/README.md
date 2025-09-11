@@ -2,6 +2,17 @@
 
 A Unity/VRChat molecular visualization system that downloads XYZ molecular data from web sources and renders 3D ball-and-stick models using compute shaders.
 
+## Required Reference URLs
+
+- Unity Editor (Archive): https://unity.com/releases/editor/archive (use 2022.3.22f1)
+- VRChat Creator Companion (VCC) Docs: https://vcc.docs.vrchat.com/
+- VRChat Creators Portal: https://creators.vrchat.com/
+- VRChat Udon Docs (incl. String Loading): https://creators.vrchat.com/worlds/udon/
+- UdonSharp Repository: https://github.com/MerlinVR/UdonSharp
+- UdonSharp VPM Repository (example): https://vpm.koyashiro.net/index.json
+- Unity Compute Shaders Manual: https://docs.unity3d.com/Manual/ComputeShaders.html
+- XYZ File Format: https://en.wikipedia.org/wiki/XYZ_file_format
+
 ## Features
 
 - **Web-based XYZ data loading** using VRChat's String Loading API

@@ -4,6 +4,16 @@
 - Unity: 2022.3.22f1
 - シーン: `Assets/Scenes/VRCDefaultWorldScene.unity`
 
+## 必須参照URL
+- Unity エディタ（アーカイブ）: https://unity.com/releases/editor/archive （使用バージョン: 2022.3.22f1）
+- VRChat クリエイター向けポータル: https://creators.vrchat.com/
+- VRChat Creator Companion (VCC) ドキュメント: https://vcc.docs.vrchat.com/
+- VRChat Udon ドキュメント（Udon/SDK3 一式）: https://creators.vrchat.com/worlds/udon/
+- UdonSharp リポジトリ: https://github.com/MerlinVR/UdonSharp
+- UdonSharp VPM リポジトリ（例）: https://vpm.koyashiro.net/index.json
+- Unity Compute Shader 解説: https://docs.unity3d.com/Manual/ComputeShaders.html
+- XYZ ファイル形式: https://en.wikipedia.org/wiki/XYZ_file_format
+
 ## 主な機能
 - **XYZ 読み込み**: ローカルのテストデータまたは URL から XYZ 形式の分子データを読み込み。
 - **レイマーチング描画**: Compute Shader で原子と結合をスクリーンスペースにレンダリング。

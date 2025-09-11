@@ -87,6 +87,7 @@ public class MoleculeDownloader : UdonSharpBehaviour
         return null;
     }
 
+    #if UNITY_EDITOR
     void LoadLocalFile(string fileUrl)
     {
         // fileUrl expected like: file:///absolute/path/to/file.xyz
@@ -115,6 +116,7 @@ public class MoleculeDownloader : UdonSharpBehaviour
             Debug.LogError($"Failed to load local file '{fileUrl}': {ex.Message}");
         }
     }
+    #endif
 
     [ContextMenu("Load Selected Molecule")]
     public void LoadSelected()
